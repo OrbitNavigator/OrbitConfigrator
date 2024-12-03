@@ -87,6 +87,7 @@ export class MavLinkSerialConnection {
       const clazz = this.REGISTRY[packet.header.msgid];
       if (clazz) {
         const data = packet.protocol.data(packet.payload, clazz);
+        data.className = clazz.name;
         sender("mavlink:data", data);
         console.log("Received packet:", data);
       } else {
