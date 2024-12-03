@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CssBaseline,
   Drawer,
@@ -52,7 +52,19 @@ const navItems = [
 const App = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(true);
   const [isDarkMode, setDarkMode] = useState(false);
-  const [currentPage, setCurrentPage] = useState(<Home />); // Default to Home
+  const [currentPage, setCurrentPage] = useState(<Home />);
+  const [Data, setData] = useState(null);
+
+  useEffect(() => {
+    const mavLinkDataListener = (event, data) => {
+      setData(data);
+      console.log(data);
+    };
+    window.mavlink.onMavLinkData(mavLinkDataListener);
+    return () => {
+      window.mavlink.onMavLinkData(null);
+    };
+  }, []);
 
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);
