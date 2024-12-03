@@ -8,12 +8,6 @@ import {
   MavLinkProtocolV2,
 } from "node-mavlink";
 
-const REGISTRY = {
-  ...minimal.REGISTRY,
-  ...common.REGISTRY,
-  ...ardupilotmega.REGISTRY,
-};
-
 export class MavLinkSerialConnection {
   constructor() {
     this.port = null;
@@ -38,14 +32,10 @@ export class MavLinkSerialConnection {
       this.port = new SerialPort({ path: portName, baudRate: baudRate });
 
       this.port.on("open", () => {
-        console.log(
-          `Port ${portName} opened successfully at baud rate ${baudRate}`
-        );
         resolve(true);
       });
 
       this.port.on("error", (err) => {
-        console.error(`Error opening port ${portName}:`, err);
         reject(false);
       });
     });
@@ -56,52 +46,43 @@ export class MavLinkSerialConnection {
       if (this.port && this.port.isOpen) {
         this.port.close((err) => {
           if (err) {
-            console.error("Error disconnecting the port:", err);
             reject(err);
           } else {
-            console.log("Port successfully disconnected.");
             this.port = null;
             resolve(true);
           }
         });
       } else {
-        console.warn("Port is not open or already disconnected.");
         resolve(false);
       }
     });
   }
 
+  isPortOpen() {
+    return this.port && this.port.isOpen;
+  }
+
   parseMavLinkData(sender) {
     if (!this.port) {
-      console.error("No port is connected. Please connect a port first.");
       return;
     }
 
-    // Create a stream pipeline that reads and parses incoming MAVLink packets
     this.reader = this.port
       .pipe(new MavLinkPacketSplitter())
       .pipe(new MavLinkPacketParser());
 
-    // Attach a listener to read parsed MAVLink data
     this.reader.on("data", (packet) => {
       const clazz = this.REGISTRY[packet.header.msgid];
       if (clazz) {
         const data = packet.protocol.data(packet.payload, clazz);
         data.className = clazz.name;
-        sender("mavlink:data", data);
-        console.log("Received packet:", data);
+        sender(data);
       } else {
         console.log(
           `Received packet with unknown msgid: ${packet.header.msgid}`
         );
       }
     });
-
-    // Handle reader errors if any occur
-    this.reader.on("error", (err) => {
-      console.error("Error in MAVLink data parsing:", err);
-    });
-
-    console.log("Started parsing MAVLink data...");
+    this.reader.on("error", (err) => {});
   }
 }

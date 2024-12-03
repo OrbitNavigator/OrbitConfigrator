@@ -13,4 +13,5 @@ contextBridge.exposeInMainWorld("mavlink", {
       ipcRenderer.removeAllListeners("mavlink:data");
     }
   },
+  isPortOpen: () => ipcRenderer.invoke("mavlink:isPortOpen"),
 });

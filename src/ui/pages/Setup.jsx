@@ -5,7 +5,6 @@ const Setup = () => {
   const [availablePorts, setAvailablePorts] = useState([]);
   const [selectedPort, setSelectedPort] = useState("");
   const [isConnected, setIsConnected] = useState(false);
-  const [Data, setData] = useState(null);
 
   const getPorts = async () => {
     try {
@@ -41,14 +40,19 @@ const Setup = () => {
   };
 
   useEffect(() => {
-    const mavLinkDataListener = (event, data) => {
-      setData(data);
-      console.log(data);
+    const checkPortStatus = async () => {
+      try {
+        const { isOpen, portName } = await window.mavlink.isPortOpen();
+        setIsConnected(isOpen);
+        setSelectedPort(portName);
+      } catch (error) {
+        console.error("Error checking port status:", error);
+        setIsConnected(false);
+        setSelectedPort(null);
+      }
     };
-    window.mavlink.onMavLinkData(mavLinkDataListener);
-    return () => {
-      window.mavlink.onMavLinkData(null);
-    };
+
+    checkPortStatus();
   }, []);
 
   return (
