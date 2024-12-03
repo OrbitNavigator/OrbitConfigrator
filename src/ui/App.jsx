@@ -23,7 +23,7 @@ import SensorsIcon from "@mui/icons-material/Sensors";
 import LinkOffIcon from "@mui/icons-material/LinkOff";
 import MapIcon from "@mui/icons-material/Map";
 
-import ConnectDisconnect from "./pages/ConnectDisconnect";
+import Setup from "./pages/Setup";
 import Home from "./pages/Home";
 import IMUData from "./pages/IMUData";
 import Logger from "./pages/Logger";
@@ -42,9 +42,9 @@ const navItems = [
   { label: "Logger", icon: <StorageIcon />, component: <Logger /> },
   { label: "IMU Data", icon: <SensorsIcon />, component: <IMUData /> },
   {
-    label: "Connect/Disconnect",
+    label: "Setup",
     icon: <LinkOffIcon />,
-    component: <ConnectDisconnect />,
+    component: <Setup />,
   },
   { label: "Map", icon: <MapIcon />, component: <Map /> },
 ];
