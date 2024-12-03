@@ -5,6 +5,7 @@ const Setup = () => {
   const [availablePorts, setAvailablePorts] = useState([]);
   const [selectedPort, setSelectedPort] = useState("");
   const [isConnected, setIsConnected] = useState(false);
+  const [Data, setData] = useState(null);
 
   const getPorts = async () => {
     try {
@@ -41,7 +42,8 @@ const Setup = () => {
 
   useEffect(() => {
     const mavLinkDataListener = (event, data) => {
-      console.log("Received MAVLink data in renderer:", data);
+      setData(data);
+      console.log(data);
     };
     window.mavlink.onMavLinkData(mavLinkDataListener);
     return () => {
