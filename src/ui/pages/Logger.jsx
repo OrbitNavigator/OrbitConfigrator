@@ -1,10 +1,9 @@
-import React from "react";
+import Linegraph from "../components/Linegraph";
 
 function Logger() {
   return (
     <div>
-      <h1>Logger</h1>
-      <p>Logs and related data will be shown here.</p>
+      <Linegraph />
     </div>
   );
 }

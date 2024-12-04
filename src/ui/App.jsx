@@ -93,7 +93,7 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{}}>
         {/* Light/Dark Mode Toggle */}
         <Box
           sx={{
@@ -156,7 +156,7 @@ const App = () => {
             bgcolor: theme.palette.background.default,
             color: theme.palette.text.primary,
             p: 3,
-            marginLeft: isDrawerOpen ? `${drawerWidth}px` : "0",
+            marginLeft: isDrawerOpen ? `${drawerWidth}px` : 0,
             transition: "margin-left 0.3s ease",
           }}
         >
