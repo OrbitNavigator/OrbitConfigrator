@@ -55,17 +55,6 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(<Home />);
   const [Data, setData] = useState(null);
 
-  useEffect(() => {
-    const mavLinkDataListener = (event, data) => {
-      setData(data);
-      console.log(data);
-    };
-    window.mavlink.onMavLinkData(mavLinkDataListener);
-    return () => {
-      window.mavlink.onMavLinkData(null);
-    };
-  }, []);
-
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);
   };
