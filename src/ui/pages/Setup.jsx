@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import { Box, Button, TextField, Autocomplete } from "@mui/material";
 
-const ConnectDisconnect = () => {
+const Setup = () => {
   const [availablePorts, setAvailablePorts] = useState([]);
   const [selectedPort, setSelectedPort] = useState("");
   const [isConnected, setIsConnected] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const ports = await window.mavlink.listSerialPorts();
-        setAvailablePorts(ports);
-      } catch (error) {
-        console.error("Error fetching serial ports:", error);
-      }
-    })();
-  }, []);
+  const getPorts = async () => {
+    try {
+      const ports = await window.mavlink.listSerialPorts();
+      setAvailablePorts(ports);
+    } catch (error) {
+      console.error("Error fetching serial ports:", error);
+    }
+  };
 
   const handleConnect = async () => {
     if (selectedPort) {
@@ -42,33 +40,41 @@ const ConnectDisconnect = () => {
   };
 
   useEffect(() => {
-    const mavLinkDataListener = (event, data) => {
-      console.log("Received MAVLink data in renderer:", data);
+    const checkPortStatus = async () => {
+      try {
+        const { isOpen, portName } = await window.mavlink.isPortOpen();
+        setIsConnected(isOpen);
+        setSelectedPort(portName);
+      } catch (error) {
+        console.error("Error checking port status:", error);
+        setIsConnected(false);
+        setSelectedPort(null);
+      }
     };
-    window.mavlink.onMavLinkData(mavLinkDataListener);
-    return () => {
-      window.mavlink.onMavLinkData(null);
-    };
+
+    checkPortStatus();
   }, []);
 
   return (
-    <Box sx={{ minWidth: 120 }}>
-      <Autocomplete
-        freeSolo
-        id="port-select"
-        options={availablePorts.map((port) => port.path)}
-        value={selectedPort}
-        onChange={(event, newValue) => {
-          setSelectedPort(newValue || "");
-        }}
-        onInputChange={(event, newInputValue) => {
-          setSelectedPort(newInputValue);
-        }}
-        disabled={isConnected}
-        renderInput={(params) => (
-          <TextField {...params} label="Port" variant="outlined" />
-        )}
-      />
+    <Box sx={{ maxWidth: 160 }}>
+      <Box onClick={getPorts}>
+        <Autocomplete
+          freeSolo
+          id="port-select"
+          options={availablePorts.map((port) => port.path)}
+          value={selectedPort}
+          onChange={(event, newValue) => {
+            setSelectedPort(newValue || "");
+          }}
+          onInputChange={(event, newInputValue) => {
+            setSelectedPort(newInputValue);
+          }}
+          disabled={isConnected}
+          renderInput={(params) => (
+            <TextField {...params} label="Port" variant="outlined" />
+          )}
+        />
+      </Box>
 
       <Button
         variant="contained"
@@ -83,4 +89,4 @@ const ConnectDisconnect = () => {
   );
 };
 
-export default ConnectDisconnect;
+export default Setup;

@@ -15,7 +15,7 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "../renderer/preload.mjs"),
+      preload: path.join(__dirname, "preload.mjs"),
       contextIsolation: true,
       nodeIntegration: true,
     },
@@ -57,8 +57,8 @@ ipcMain.handle("mavlink:connectPort", async (event, portName, baudRate) => {
   try {
     const success = await mavLinkConnection.connectPort(portName, baudRate);
     if (success) {
-      mavLinkConnection.parseMavLinkData((channel, data) => {
-        win.webContents.send(channel, data);
+      mavLinkConnection.parseMavLinkData((data) => {
+        win.webContents.send("mavlink:data", data);
       });
       console.log(`Port ${portName} opened successfully at ${baudRate}`);
       return true;
@@ -83,5 +83,18 @@ ipcMain.handle("mavlink:disconnectPort", async (event) => {
   } catch (error) {
     console.error("Failed to disconnect port:", error);
     throw error;
+  }
+});
+
+ipcMain.handle("mavlink:isPortOpen", async () => {
+  try {
+    const isOpen = mavLinkConnection.isPortOpen();
+    const portName = mavLinkConnection.port
+      ? mavLinkConnection.port.path
+      : null;
+    return { isOpen, portName };
+  } catch (error) {
+    console.error("Error checking port status:", error);
+    return { isOpen: false, portName: null };
   }
 });
