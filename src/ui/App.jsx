@@ -10,7 +10,6 @@ import {
   Toolbar,
   Box,
   IconButton,
-  Switch,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -21,6 +20,7 @@ import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
 import StorageIcon from "@mui/icons-material/Storage";
 import SensorsIcon from "@mui/icons-material/Sensors";
 import LinkOffIcon from "@mui/icons-material/LinkOff";
+import LinkIcon from "@mui/icons-material/Link";
 import MapIcon from "@mui/icons-material/Map";
 
 import Setup from "./pages/Setup";
@@ -32,28 +32,25 @@ import SensorHealth from "./pages/SensorHealth";
 
 const drawerWidth = 250;
 
-const navItems = [
-  { label: "Home", icon: <HomeIcon />, component: <Home /> },
-  {
-    label: "Sensor Health",
-    icon: <HealthAndSafetyIcon />,
-    component: <SensorHealth />,
-  },
-  { label: "Logger", icon: <StorageIcon />, component: <Logger /> },
-  { label: "IMU Data", icon: <SensorsIcon />, component: <IMUData /> },
-  {
-    label: "Setup",
-    icon: <LinkOffIcon />,
-    component: <Setup />,
-  },
-  { label: "Map", icon: <MapIcon />, component: <Map /> },
-];
-
 const App = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(true);
   const [isDarkMode, setDarkMode] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   const [currentPage, setCurrentPage] = useState(<Home />);
   const [Data, setData] = useState(null);
+
+  const navItems = [
+    // { label: "Home", icon: <HomeIcon />, component: <Home /> },
+    // { label: "Sensor Health", icon: <HealthAndSafetyIcon />, component: <SensorHealth />, },
+    { label: "Logger", icon: <StorageIcon />, component: <Logger /> },
+    // { label: "IMU Data", icon: <SensorsIcon />, component: <IMUData /> },
+    {
+      label: "Setup",
+      icon: isConnected ? <LinkIcon /> : <LinkOffIcon />,
+      component: <Setup />,
+    },
+    // { label: "Map", icon: <MapIcon />, component: <Map /> },
+  ];
 
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);
@@ -62,6 +59,20 @@ const App = () => {
   const toggleTheme = () => {
     setDarkMode(!isDarkMode);
   };
+
+  useEffect(() => {
+    const checkPortStatus = async () => {
+      try {
+        const { isOpen, portName } = await window.mavlink.isPortOpen();
+        setIsConnected(isOpen);
+      } catch (error) {
+        console.error("Error checking port status:", error);
+        setIsConnected(false);
+      }
+    };
+
+    checkPortStatus();
+  }, []);
 
   const theme = createTheme({
     palette: {
